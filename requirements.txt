@@ -1,0 +1,3 @@
+# The NADC LAMOST module is currently provided by astroquery PR #3666.
+astroquery @ git+https://github.com/china-vo/astroquery.git@987490c7ced2dc8713bf9da4e65aeea9972fb9af
+matplotlib
