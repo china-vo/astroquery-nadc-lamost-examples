@@ -6,6 +6,9 @@ Examples of querying LAMOST data and analysing spectra with
 The examples cover catalog export, LRS spectrum export and smoothing, MRS
 batch reading and plotting, and a Ca II H&K activity-index calculation.
 See [the tutorial](TUTORIAL.rst) for the complete workflows.
+[Request inspection examples](TUTORIAL.rst#inspecting-request-parameters)
+cover payload formats and token redaction; this section requires the local
+checkout described below until the payload change is published.
 
 ## Install
 

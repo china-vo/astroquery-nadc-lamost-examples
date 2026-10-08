@@ -6,6 +6,64 @@ Install the dependencies described in the `README <README.md>`_ first.
 Interface parameters and service limitations are documented in
 `the module documentation <https://github.com/china-vo/astroquery/blob/987490c7ced2dc8713bf9da4e65aeea9972fb9af/docs/nadc/lamost.rst>`_.
 
+Inspecting Request Parameters
+-----------------------------
+
+This section uses the local ``nadc-lamost-new-module`` checkout with the
+stable POST payload preview change. That change is not included in the
+commit currently pinned in ``requirements.txt``. Install the neighbouring
+checkout using ``python -m pip install -e ../astroquery`` as described in the
+README before running these examples.
+
+The examples below are independent of the Setup section and do not send data
+queries. ``get_query_payload=True`` returns request parameters, not catalog
+results. Native POST previews separate the JSON body from the URL parameters:
+
+.. code-block:: python
+
+   from astroquery.nadc.lamost import LamostClass
+
+   anonymous = LamostClass(token='', data_release='dr10', sub_version='v2.0')
+   payload = anonymous.query_catalog(
+       'combined', columns=['obsid', 'ra', 'dec'], max_rows=5,
+       get_query_payload=True)
+   print(payload['json']['rows'])  # 5
+   print(payload['json']['showcol'])  # ['obsid', 'ra', 'dec']
+   print(payload['params'])  # {}
+
+The same structure is returned when a token is configured. This placeholder
+is used only to demonstrate redaction; it is not a valid access token:
+
+.. code-block:: python
+
+   authenticated = LamostClass(
+       token='example-token', data_release='dr10', sub_version='v2.0')
+   payload = authenticated.query_catalog(
+       'combined', columns=['obsid', 'ra', 'dec'], max_rows=5,
+       get_query_payload=True)
+   print(payload['json']['rows'])  # 5
+   print(payload['params'])  # {'token': '<redacted>'}
+
+A redacted token indicates that a token would be sent; it does not establish
+that the service will accept it or identify how it was configured.
+
+GET previews, including SQL and related-observation lookups, are flat:
+
+.. code-block:: python
+
+   sql_payload = anonymous.query_sql(
+       'SELECT obsid, ra, dec FROM combined LIMIT 5', get_query_payload=True)
+   print(sql_payload['sql'])  # SELECT obsid, ra, dec FROM combined LIMIT 5
+   repeat_payload = anonymous.query_repeat_observations(
+       obsid=101001, get_query_payload=True)
+   print(repeat_payload['obsid'])  # 101001 (a string)
+
+Catalog queries that use SQL, including cone searches and legacy-release
+queries, also return the flat SQL format. Their row limit is part of the SQL
+statement, so there is no ``rows`` key. Structured SQL previews may fetch
+field metadata, and object names may require online coordinate resolution.
+The three code blocks above use neither and can run offline.
+
 Setup
 -------
 
